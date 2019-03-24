@@ -2,7 +2,7 @@ from utils.iostream import InputStream, OutputStream
 
 
 def encode(in_stream: InputStream, out_stream: OutputStream, key: str):
-    inp = b''
+    inp = ''
     for line in in_stream:
         inp += line
 
@@ -10,7 +10,7 @@ def encode(in_stream: InputStream, out_stream: OutputStream, key: str):
     key_pos = 0
     key_len = len(key)
     for symb in inp:
-        code = symb ^ ord(key[key_pos])
+        code = ord(symb) ^ ord(key[key_pos])
         symb = bytes([code])
         out += symb
         key_pos = (key_pos + 1) % key_len
@@ -18,4 +18,16 @@ def encode(in_stream: InputStream, out_stream: OutputStream, key: str):
 
 
 def decode(in_stream: InputStream, out_stream: OutputStream, key: str):
-    encode(in_stream, out_stream, key)
+    inp = b''
+    for line in in_stream:
+        inp += line
+
+    out = ''
+    key_pos = 0
+    key_len = len(key)
+    for symb in inp:
+        code = symb ^ ord(key[key_pos])
+        symb = chr(code)
+        out += symb
+        key_pos = (key_pos + 1) % key_len
+    out_stream.write(out)

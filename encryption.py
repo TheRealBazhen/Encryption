@@ -25,20 +25,26 @@ def main():
                              ' --key if specified')
     args = parser.parse_args()
 
-    binary_mode = (args.cipher == 'vernam')
-    if binary_mode and (not args.in_file or not args.out_file):
-        print('Not able to use stdin and stdout in binary mode.'
-              'Please, use file input and output')
+    binary_mode_inp = (args.cipher == 'vernam' and args.mode == 'decode')
+    binary_mode_out = (args.cipher == 'vernam' and args.mode == 'encode')
+    if binary_mode_inp and not args.in_file:
+        print('Not able to use stdin in binary mode. '
+              'Please, use file for input.')
+        return
+    if binary_mode_out and not args.out_file:
+        print('Not able to use stdout in binary mode. '
+              'Please, use file for output.')
+        return
     if not args.in_file:
         print('Input text to process, press Ctrl+D to finish input:')
     try:
         in_stream = InputStream(args.in_file if args.in_file
-                                else sys.stdin, binary_mode)
+                                else sys.stdin, binary_mode_inp)
     except (FileNotFoundError, IOError):
         print('Could not open file \'{}\''.format(args.in_file))
         return
     out_stream = OutputStream(args.out_file if args.out_file
-                              else sys.stdout, binary_mode)
+                              else sys.stdout, binary_mode_out)
 
     if args.key_path:
         try:
